@@ -8,6 +8,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"time"
+	"web_app/settings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/natefinch/lumberjack"
@@ -16,14 +17,16 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+var lg *zap.Logger
+
 // Init 初始化Logger
 
-func Init() (err error) {
+func Init(cfg *settings.LogConfig, model string) (err error) {
 	writeSyncer := getLogWriter(
-		viper.GetString("log.filename"),
-		viper.GetInt("log.MaxSize"),
-		viper.GetInt("log.MaxBackups"),
-		viper.GetInt("log.MaxAge"),
+		cfg.Filename,
+		cfg.MaxSize,
+		cfg.MaxBackups,
+		cfg.MaxAge,
 	)
 	encoder := getEncoder()
 	var l = new(zapcore.Level) //哪种级别的日志将被写入。

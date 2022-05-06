@@ -9,9 +9,11 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"web_app/controller"
 	"web_app/dao/mysql"
 	"web_app/dao/redis"
 	"web_app/logger"
+	"web_app/pkg/snowflake"
 	"web_app/routes"
 	"web_app/settings"
 
@@ -27,24 +29,36 @@ func main() {
 		return
 	}
 	//2.初始化日志
-	if err := logger.Init(); err != nil {
+	if err := logger.Init(settings.Conf.LogConfig, settings.Conf.AppConfig.Mode); err != nil {
 		fmt.Printf("init logger failed,err:%v\n", err)
 		return
 	}
 	defer zap.L().Sync()
 	zap.L().Debug("logger init success...")
 	//3.初始化mysql连接
-	if err := mysql.Init(); err != nil {
+	if err := mysql.Init(settings.Conf.MySQLConfig); err != nil {
 		fmt.Printf("init mysql failed,err:%v\n", err)
 		return
 	}
 	defer mysql.Close()
 	//4.初始化redis连接
-	if err := redis.Init(); err != nil {
+	if err := redis.Init(settings.Conf.RedisConfig); err != nil {
 		fmt.Printf("init redis failed,err:%v\n", err)
 		return
 	}
 	defer redis.Close()
+
+	//初始化雪花算法生成id
+	if err := snowflake.Init(settings.Conf.AppConfig.StartTime, settings.Conf.AppConfig.MachineID); err != nil {
+		fmt.Printf("init snowflake failed,err:%v\n", err)
+		return
+	}
+
+	//初始化一个gin框架内置的校验器使用的翻译器
+	if err := controller.InitTrans("zh"); err != nil {
+		fmt.Printf("init validator trans failed,err:%v\n", err)
+		return
+	}
 	//5.注册路由
 	r := routes.SetUp()
 	//6.启动服务（优雅关机）

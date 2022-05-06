@@ -1,7 +1,10 @@
 app:
-  name: "web_app"
+  name: "bluebell"
   mode: "dev"
   port: 8081
+  version: "v0.0.1"
+  start_time: "2022-03-20"
+  machine_id: 1
 
 log:
   level: "debug"
@@ -15,7 +18,7 @@ mysql:
   port: 3306
   user: "root"
   password: "20190624319xq"
-  dbname: "sql_demo"
+  dbname: "bluebell"
   max_open_conns: 200
   max_idle_conns: 50
 
