@@ -4,15 +4,14 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
-	"errors"
 	"web_app/models"
 )
 
-var (
-	ErrorUserExist       = errors.New("用户已存在")
-	ErrorUserNoExist     = errors.New("用户不存在")
-	ErrorInvalidPassWord = errors.New("用户名或密码错误")
-)
+//var (
+//	ErrorUserExist       = errors.New("用户已存在")
+//	ErrorUserNoExist     = errors.New("用户不存在")
+//	ErrorInvalidPassWord = errors.New("用户名或密码错误")
+//)
 
 func CheckUserExist(username string) (err error) {
 	sqlStr := `select count(user_id) from user where username = ?`
@@ -57,5 +56,13 @@ func Login(user *models.User) (err error) {
 	if password != user.Password {
 		return ErrorInvalidPassWord
 	}
+	return
+}
+
+// GetUserById 根据id获取用户信息
+func GetUserById(uid int64) (user *models.User, err error) {
+	user = new(models.User)
+	sqlStr := `select user_id, username from user where user_id = ?`
+	err = db.Get(user, sqlStr, uid)
 	return
 }

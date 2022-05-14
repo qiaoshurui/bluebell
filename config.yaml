@@ -31,4 +31,8 @@ redis:
   pool_size: 100
 
 
+auth:
+  jwt_expire: 8760
+
+
 
